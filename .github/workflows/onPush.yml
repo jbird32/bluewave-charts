@@ -1,25 +1,5 @@
-# delete all remote tags (linux version)
-# git ls-remote --tags origin | awk '/^(.*)(s+)(.*[a-zA-Z0-9])$/ {print ":" $2}' | xargs git push origin
 
-# delete one remote tag & matching local tag
-# git push --delete origin <tag_name> & git tag -d <tag_name>
-# example: git push --delete origin v1.0 & git tag -d v1.0
-
-
-# note:
-# the git command line doesn't have permissions to delete releases, only tags (it's part of Github only)
-
-
-# execute github workflow
-# git tag <release_name> (must include v in release name) & git push origin <release_name>
-# example: git tag v1.0 & git push origin v1.0
-
-
-
-on:
-  push:
-    tags:
-    - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+on: [push]
 
 name: Create Release
 
@@ -47,11 +27,24 @@ jobs:
       - name: Create compiled project directory
         run: mkdir compiledProjectDirectory
 
+     ### Minify JS and consolidate into one file
 
-     # Zip project
-      - name: Zip configured project directory into downloadable release.zip file
-        run: cd compiledProjectDirectory; zip -r ../bluewave_tx-${{ env.releaseLabel }}.zip *
+     # Minify web/app file directory into individually minified files
+      - name: Minify all files within web/app directory
+        uses: nizarmah/auto-minify@v2.1
+        with:
+          directory: ./src
+          overwrite: true
 
+     # Append all minified files of web/app into a single file (bluewave.js)
+      - name: Combine minified web files into bluewave.js file
+        run: find ./src -name '*.js' -exec cat {} \; > ./bluewave.js
+
+     # delete web/app directory so it's not included in release
+      - name: Remove directory from web folder
+        uses: JesseTG/rm@v1.0.2
+        with:
+          path: src
 
      # Create the release to serve as a place to export to
       - name: Create Release
@@ -63,7 +56,7 @@ jobs:
           tag_name: ${{ env.releaseLabel }}
           release_name: Release ${{ env.releaseLabel }}
           body: |
-            BlueWave Neo4j Plugin Release ${{ env.releaseLabel }}
+            BlueWave Charts ${{ env.releaseLabel }}
           draft: false
           prerelease: false
 
@@ -75,6 +68,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: bluewave_tx-${{ env.releaseLabel }}.zip
-          asset_name: bluewave_tx-${{ env.releaseLabel }}.zip
-          asset_content_type: application/zip
+          asset_path: bluewave_tx-${{ env.releaseLabel }}
+          asset_name: bluewave_tx-${{ env.releaseLabel }}
+          asset_content_type: application
