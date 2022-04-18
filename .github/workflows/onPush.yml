@@ -12,17 +12,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Get tag reference id
-            # parse the github reference tag from the direct input (github.ref)
-        run: |
-             githubRef=${{ github.ref }}
-             githubRef="${githubRef/'refs/tags'/''}"
-             githubRef="${githubRef/'/'/''}"
-             githubRef="${githubRef/'v'/''}"
-             echo "releaseLabel=$githubRef" >> $GITHUB_ENV
-      - name: Read exported variable - (test to verify the dynamic releaseLabel Variable is global)
-        run: |
-          echo $releaseLabel
      # create project directory
       - name: Create compiled project directory
         run: mkdir compiledProjectDirectory
@@ -53,10 +42,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions
         with:
-          tag_name: ${{ env.releaseLabel }}
-          release_name: Release ${{ env.releaseLabel }}
+          tag_name: test
+          release_name: test
           body: |
-            BlueWave Charts ${{ env.releaseLabel }}
+            BlueWave Charts
           draft: false
           prerelease: false
 
