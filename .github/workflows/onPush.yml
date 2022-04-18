@@ -25,11 +25,11 @@ jobs:
           directory: ./src
           overwrite: true
 
-     # Append all minified files of web/app into a single file (bluewave.js)
+     # Append all minified files of src into a single file (bluewave.js)
       - name: Combine minified web files into bluewave.js file
         run: find ./src -name '*.js' -exec cat {} \; > ./bluewave.js
 
-     # delete web/app directory so it's not included in release
+     # delete src directory so it's not included in release
       - name: Remove directory from web folder
         uses: JesseTG/rm@v1.0.2
         with:
@@ -42,8 +42,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions
         with:
-          tag_name: test
-          release_name: test
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
           body: |
             BlueWave Charts
           draft: false
