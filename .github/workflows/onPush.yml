@@ -27,7 +27,7 @@ jobs:
 
      # Append all minified files of src into a single file (bluewave.js)
       - name: Combine minified web files into bluewave.js file
-        run: find ./src -name '*.js' -exec cat {} \; > ./bluewave.js
+        run: find ./src -name '*.js' -exec cat {} \; > ./bluewave-charts.js
 
      # delete src directory so it's not included in release
       - name: Remove directory from web folder
@@ -57,6 +57,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./
+          asset_path: ./bluewave-charts.js
           asset_name: bluewave-charts
           asset_content_type: application
