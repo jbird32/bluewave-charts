@@ -31,8 +31,10 @@ jobs:
 
      # Grab date
       - name: Get date
-        run: DATE=$(date '+%Y%m%d%H%M%S')
-        
+        run: |
+             DATE=$(date '+%Y%m%d%H%M%S')
+             echo "releaseLabel=$DATE" >> $GITHUB_ENV
+             
      # Create the release to serve as a place to export to
       - name: Create Release
         id: create_release
@@ -40,8 +42,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions
         with:
-          tag_name: ${DATE}
-          release_name: Release ${DATE}
+          tag_name: ${{ env.releaseLabel }}
+          release_name: Release ${{ env.releaseLabel }}
           body: |
             BlueWave Charts
           draft: false
