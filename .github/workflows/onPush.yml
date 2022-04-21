@@ -29,12 +29,10 @@ jobs:
       - name: Combine minified web files into bluewave.js file
         run: find ./src -name '*.js' -exec cat {} \; > ./bluewave-charts.js
 
-     # delete src directory so it's not included in release
-      - name: Remove directory from web folder
-        uses: JesseTG/rm@v1.0.2
-        with:
-          path: src
-
+     # Grab date
+      - name: Get date
+        run: DATE=$(date '+%Y%m%d%H%M%S')
+        
      # Create the release to serve as a place to export to
       - name: Create Release
         id: create_release
@@ -42,8 +40,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions
         with:
-          tag_name: test-v1.0
-          release_name: Release test-v1.0
+          tag_name: ${{ DATE }}
+          release_name: Release ${{ DATE }}
           body: |
             BlueWave Charts
           draft: false
